@@ -114,6 +114,13 @@ Hold each controller **flat** when it powers on, because it calibrates then. Pre
 ~/.local/bin/arduino-cli compile --fqbn esp32:esp32:esp32 --build-property "compiler.cpp.extra_flags=-DPLAYER_ID=2" --output-dir build-p2 MarbleController && ~/.local/bin/arduino-cli upload --fqbn esp32:esp32:esp32 -p /dev/ttyUSB0 --input-dir build-p2 MarbleController
 ```
 
+### Also works with PCMonitorX
+
+The same controllers can play portrait versions of these games (Dodge, Catch, Highway, Star Shooter,
+Cave Flyer, Pong) on a small ESP32-S3 touch display: **[PCMonitorX](https://github.com/yuvainGARG/pcmonitorx)**,
+a desk PC monitor with apps and games. The controllers connect to it directly over Bluetooth, with no Pi needed.
+A controller connects to one device at a time, so close the arcade first.
+
 ## 3D-printed cases
 
 `case/` has a screw-together case for each controller (base + lid), already sized for each board:
