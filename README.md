@@ -12,6 +12,12 @@ Tilt games for the **Raspberry Pi 5**, played with **ESP32 + ADXL345** controlle
 python3 arcade.py
 ```
 
+## Download
+
+Ready-made files are on the **[Releases page](https://github.com/yuvainGARG/tilt-arcade/releases/latest)**:
+a Windows app (no Python needed: unzip and run `TiltArcade.exe`), a Raspberry Pi package with an installer
+(`bash install_pi.sh`), ready-made controller firmware for both boards (flash from the browser), and the case files.
+
 ### On Windows (or another computer)
 
 Needs Python 3.10+ and a PC with Bluetooth (Bluetooth LE).
