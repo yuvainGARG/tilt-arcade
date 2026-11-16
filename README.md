@@ -155,9 +155,13 @@ A controller connects to one device at a time, so close the arcade first.
 
 ## License
 
-Copyright (C) 2026 yuvainGARG
+Copyright (C) 2026 yuvainGARG. Tilt Arcade (code, 3D models and docs) is licensed under
+**[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)**:
 
-Tilt Arcade is free software: you can redistribute it and/or modify it under the terms of the
-GNU General Public License, version 3 or (at your option) any later version. It comes with no
-warranty. See [LICENSE](LICENSE) for the full text. If you share a modified version, it must also be
-released under the GPL with its source code.
+- **You can** build it, use it, change it and share it for free.
+- **Give credit**: link back to this repo.
+- **Non-commercial**: no selling devices, kits, cases or products that use it without my written
+  permission. Ask me if you would like to.
+- **Share alike**: if you share a changed version, use the same license.
+
+Full text: [LICENSE](LICENSE). Versions published before this change were briefly GPL-3.0.
