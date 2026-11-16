@@ -152,3 +152,12 @@ A controller connects to one device at a time, so close the arcade first.
 ## Files
 
 `arcade.py` menu · `settings_page.py` controller settings · `tiltlib.py` shared code (Bluetooth, physics, drawing, map picker, scores) · one file per game (`dodge.py`, `marble_race.py`, `coins.py`, `snake.py`, `bricks.py`, `cave.py`, `pong.py`, `sumo.py`, `hockey.py`, `paint.py`, `potato.py`, `trail_duel.py`, `hole_maze.py`, `meteor.py`, `catch.py`, `highway.py`, `shooter.py`, `laprace.py`, `targets.py`, `balance.py`, `tanks.py`, `koth.py`, co-op: `tether.py`, `laser.py`, `defend.py`, `vault.py`, `paint_coop.py`) · `MarbleController/` ESP32 sketch · `case/` 3D-printed cases
+
+## License
+
+Copyright (C) 2026 yuvainGARG
+
+Tilt Arcade is free software: you can redistribute it and/or modify it under the terms of the
+GNU General Public License, version 3 or (at your option) any later version. It comes with no
+warranty. See [LICENSE](LICENSE) for the full text. If you share a modified version, it must also be
+released under the GPL with its source code.
