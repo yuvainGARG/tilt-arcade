@@ -1,0 +1,7 @@
+__pycache__/
+build-p2/
+build-s3/
+scores.json
+settings.json
+MarbleController/build/
+case/result.json
