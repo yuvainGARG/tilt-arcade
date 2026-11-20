@@ -9,7 +9,7 @@ source.exclude_patterns = screenshot.png
 version = 1.0.0
 icon.filename = %(source.dir)s/icon.png
 # bleak comes from its own python-for-android recipe (android/recipes/bleak)
-requirements = python3==3.13.5,hostpython3==3.13.5,pygame,pyjnius==1.9.0,typing_extensions,bleak
+requirements = python3==3.13.5,hostpython3==3.13.5,pygame,pyjnius==1.9.0,bleak
 orientation = landscape
 fullscreen = 1
 android.permissions = BLUETOOTH, BLUETOOTH_ADMIN, BLUETOOTH_SCAN, BLUETOOTH_CONNECT, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION
