@@ -17,7 +17,6 @@ android.api = 34
 android.minapi = 24
 android.archs = arm64-v8a
 android.accept_sdk_license = True
-android.add_src = android/java
 p4a.bootstrap = sdl2
 p4a.local_recipes = android/recipes
 android.debug_artifact = apk
