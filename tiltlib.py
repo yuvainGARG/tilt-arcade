@@ -21,6 +21,8 @@ except ImportError:
     HAVE_BLEAK = False
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+# Running as the Android app (python-for-android sets ANDROID_ARGUMENT)
+ANDROID = "ANDROID_ARGUMENT" in os.environ or hasattr(sys, "getandroidapilevel")
 SCORES_FILE = os.path.join(HERE, "scores.json")
 
 # ---------------------------------------------------------------- settings
@@ -178,8 +180,21 @@ async def _run_player(ctrl, p, device, radio_lock):
     ctrl.set_status(p, "searching")
 
 
+def _android_permissions():
+    """Android 12+ needs "Nearby devices" (BLUETOOTH_SCAN/CONNECT) and location before scanning."""
+    try:
+        from android.permissions import request_permissions
+    except ImportError:
+        return
+    done = threading.Event()
+    request_permissions(["android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT",
+                         "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"],
+                        lambda perms, results: done.set())
+    done.wait(120)
+
+
 async def _bluetoothctl(*args):
-    if not sys.platform.startswith("linux"):    # BlueZ tool, Linux only (not needed on Windows/macOS)
+    if ANDROID or not sys.platform.startswith("linux"):    # BlueZ tool, Linux only (not needed on Windows/macOS)
         return ""
     try:
         proc = await asyncio.create_subprocess_exec(
@@ -239,7 +254,11 @@ def controllers():
     if _ctrl is None:
         _ctrl = Controllers()
         if HAVE_BLEAK:
-            threading.Thread(target=lambda: asyncio.run(_ble_main(_ctrl)), daemon=True).start()
+            def ble():
+                if ANDROID:
+                    _android_permissions()
+                asyncio.run(_ble_main(_ctrl))
+            threading.Thread(target=ble, daemon=True).start()
         else:
             print("bleak not installed - keyboard only")
     return _ctrl
@@ -276,7 +295,9 @@ def events():
         elif ev.type == pygame.VIDEORESIZE and not _fullscreen:
             pygame.display.set_mode(ev.size, pygame.RESIZABLE)
         elif ev.type == pygame.KEYDOWN:
-            if ev.key == pygame.K_F11:
+            if ev.key == getattr(pygame, "K_AC_BACK", -1):
+                out.append(pygame.K_ESCAPE)  # Android back button = Esc
+            elif ev.key == pygame.K_F11:
                 _fullscreen = not _fullscreen
                 _apply_mode()
             else:
@@ -317,6 +338,57 @@ def board_tilt(ctrl, d):
     return x, y
 
 
+# ---------------------------------------------------------------- phone tilt (Android)
+class _PhoneTilt:
+    """The phone's own accelerometer as player 1's controller when no tilt controller is connected.
+    SDL turns the accelerometer into a joystick with axes in g, already rotated to match the screen."""
+
+    def __init__(self):
+        self.js = None
+        try:
+            pygame.joystick.init()
+            for i in range(pygame.joystick.get_count()):
+                js = pygame.joystick.Joystick(i)
+                if "accel" in js.get_name().lower():
+                    js.init()
+                    self.js = js
+                    break
+        except pygame.error:
+            self.js = None
+        self.base = None
+
+    def raw(self):
+        return (self.js.get_axis(0), self.js.get_axis(1))
+
+    def get(self):
+        if self.js is None:
+            return None
+        x, y = self.raw()
+        if self.base is None:
+            self.base = (x, y)
+        x, y = (x - self.base[0]) * SENSITIVITY * 1.4, (y - self.base[1]) * SENSITIVITY * 1.4
+        return (0.0 if abs(x) < DEADZONE else x, 0.0 if abs(y) < DEADZONE else y)
+
+
+_phone = None
+
+
+def phone_tilt():
+    """Phone tilt for player 1 on Android, or None (not Android / no sensor)."""
+    global _phone
+    if not ANDROID:
+        return None
+    if _phone is None:
+        _phone = _PhoneTilt()
+    return _phone.get()
+
+
+def phone_recalibrate():
+    """Make the way the phone is held right now the 'level' position."""
+    if _phone is not None and _phone.js is not None:
+        _phone.base = _phone.raw()
+
+
 def _ctrl_tilt(ctrl, p):
     x, y = board_tilt(ctrl, DEV[p])
     x *= SENSITIVITY
@@ -327,6 +399,10 @@ def _ctrl_tilt(ctrl, p):
 def player_tilt(ctrl, p):
     """Tilt for player p: its controller, or its keys (WASD / arrows) if pressed or not connected."""
     kx, ky = _kb(p)
+    if not (kx or ky) and not ctrl.connected(p) and p == 1:
+        ph = phone_tilt()
+        if ph is not None:
+            return ph
     if kx or ky or not ctrl.connected(p):
         return (kx, ky)
     return _ctrl_tilt(ctrl, p)
@@ -341,18 +417,26 @@ def solo_tilt(ctrl):
     for p in (1, 2):
         if ctrl.connected(p):
             return _ctrl_tilt(ctrl, p)
-    return (0.0, 0.0)
+    ph = phone_tilt()
+    return ph if ph is not None else (0.0, 0.0)
 
 
 def controller_tilt(ctrl):
     """Strongest tilt from connected controllers only (no keyboard)."""
-    cands = [_ctrl_tilt(ctrl, p) for p in (1, 2) if ctrl.connected(p)] or [(0.0, 0.0)]
+    cands = [_ctrl_tilt(ctrl, p) for p in (1, 2) if ctrl.connected(p)]
+    if not cands:
+        ph = phone_tilt()
+        cands = [ph] if ph is not None else [(0.0, 0.0)]
     return max(cands, key=lambda t: abs(t[0]) + abs(t[1]))
 
 
 def menu_tilt(ctrl):
     """Strongest tilt from any controller or key set (for menus)."""
     cands = [_kb(1), _kb(2)] + [_ctrl_tilt(ctrl, p) for p in (1, 2) if ctrl.connected(p)]
+    if not (ctrl.connected(1) or ctrl.connected(2)):
+        ph = phone_tilt()
+        if ph is not None:
+            cands.append(ph)
     return max(cands, key=lambda t: abs(t[0]) + abs(t[1]))
 
 

@@ -262,6 +262,7 @@ def draw_menu(view, sel, hold, ctrl, t, first):
 
 
 def menu(ctrl, sel):
+    tl.phone_recalibrate()  # Android: the way the phone is held in the menu counts as level
     view = tl.View()
     clock = pygame.time.Clock()
     hold = tl.Hold(1.0)
