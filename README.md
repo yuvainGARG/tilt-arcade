@@ -18,6 +18,17 @@ Ready-made files are on the **[Releases page](https://github.com/yuvainGARG/tilt
 a Windows app (no Python needed: unzip and run `TiltArcade.exe`), a Raspberry Pi package with an installer
 (`bash install_pi.sh`), ready-made controller firmware for both boards (flash from the browser), and the case files.
 
+### On Android
+
+Download **TiltArcade-Android.apk** from the [Releases page](https://github.com/yuvainGARG/tilt-arcade/releases/latest)
+and open it on the phone (allow "Install unknown apps" for your browser or file manager when Android asks).
+64-bit phones (arm64), Android 7 or newer.
+
+- **Controllers:** they connect over Bluetooth like on the Pi. Allow "Nearby devices" (and location) when asked.
+- **No controller?** Tilt the phone: it's player 1. The way you hold the phone while the menu is showing counts as level.
+- Tap a game in the menu (tap again to start). The Android **back** button works like Esc.
+- Built by GitHub Actions (`.github/workflows/android.yml`, `buildozer.spec`, recipes in `android/`).
+
 ### On Windows (or another computer)
 
 Needs Python 3.10+ and a PC with Bluetooth (Bluetooth LE).
